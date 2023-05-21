@@ -1,35 +1,43 @@
 {
-  "id": "logcleaner",
-  "name": "Log Cleaner",
-  "author": "Arnaud_69",
-  "description":{
-    "fr_FR": "Plugin pour nettoyer les logs et les messages"
-  },
-  "licence": "AGPL",
-  "require": "4.2",
-  "version": "1.0",
-  "category": "programming",
-  "hasDependency": false,
-  "hasOwnDeamon": false,
-  "maxDependancyInstallTime": 0,
-  "changelog": "",
-  "documentation": "",
-  "link": {
-    "forum": "Lien vers le forum",
-    "video": "Lien vers une video"
-  },
-  "language": [ 
-    "fr_FR"
-  ],
-  "compatibility": [
-    "miniplus",
-    "smart",
-    "rpi",
-    "docker",
-    "diy",
-    "mobile",
-    "v4"
-  ],
-  "changelog_beta": "",
-  "documentation_beta": ""
+	"id" : "logcleaner",
+	"name" : "Log Cleaner",
+	"description" : {
+		"fr_FR": "Plugin pour nettoyer les logs et les messages"
+	},
+	"licence" : "AGPL",
+	"author" : "Arnaud69",
+	"require" : "4.2.0",
+	"category" : "programming",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "",
+	"documentation" : "",
+	"changelog_beta" : "",
+	"documentation_beta" : "",
+	"link" : {
+		"forum":"Lien vers le forum",
+		"video" : "Lien vers une video"
+	},
+	"language": [
+		"fr_FR",
+		"en_US",
+		"es_ES",
+		"de_DE",
+		"ru_RU",
+		"id_ID",
+		"it_IT",
+		"ja_JP",
+		"pt_PT"
+	],
+	"compatibility": [
+		"miniplus",
+		"smart",
+		"rpi",
+		"docker",
+		"diy",
+		"mobile",
+		"v4",
+		"atlas"
+	]
 }
