@@ -1,0 +1,35 @@
+{
+  "id": "logCleaner",
+  "name": "Log Cleaner",
+  "author": "Arnaud_69",
+  "description":{
+    "fr_FR": "Plugin pour nettoyer les logs et les messages"
+  },
+  "licence": "AGPL",
+  "require": "4.2",
+  "version": "1.0",
+  "category": "programming",
+  "hasDependency": false,
+  "hasOwnDeamon": false,
+  "maxDependancyInstallTime": 0,
+  "changelog": "",
+  "documentation": "",
+  "link": {
+    "forum": "Lien vers le forum",
+    "video": "Lien vers une video"
+  },
+  "language": [ 
+    "fr_FR"
+  ],
+  "compatibility": [
+    "miniplus",
+    "smart",
+    "rpi",
+    "docker",
+    "diy",
+    "mobile",
+    "v4"
+  ],
+  "changelog_beta": "",
+  "documentation_beta": ""
+}
