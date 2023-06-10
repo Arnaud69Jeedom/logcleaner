@@ -37,8 +37,11 @@ class logcleaner extends eqLogic {
 
   /*
   * Fonction exécutée automatiquement toutes les minutes par Jeedom
-  public static function cron() {}
   */
+  // public static function cron() {
+  //   log::add(__CLASS__, 'debug', " **** cron ****", __FILE__);
+  //   logcleaner::execute();
+  // }
 
   /*
   * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
@@ -67,8 +70,12 @@ class logcleaner extends eqLogic {
 
   /*
   * Fonction exécutée automatiquement tous les jours par Jeedom
-  public static function cronDaily() {}
   */
+  public static function cronDaily() {
+    log::add(__CLASS__, 'debug', " **** cronDaily ****", __FILE__);
+    logcleaner::execute();
+  }
+
 
   /*     * *********************Méthodes d'instance************************* */
 
@@ -139,6 +146,138 @@ class logcleaner extends eqLogic {
 
   /*     * **********************Getteur Setteur*************************** */
 
+  /**
+   * Récupérer la configuration de l'équipement
+   */
+  private static function getMyConfiguration(): StdClass
+  {
+    log::add(__CLASS__, 'debug', 'fonction: ' . __FUNCTION__);
+
+    $configuration = new StdClass();
+
+    // Lecture et Analyse de la configuration
+
+    // Nombre de jours
+    log::add(__CLASS__, 'debug', ' Récupération nb jours', __FILE__);
+    $dayNumber = config::byKey('dayNumber', __CLASS__);
+    log::add(__CLASS__, 'debug', ' > Nb jours : ' . $dayNumber, __FILE__);
+
+    if ($dayNumber != '') {
+        if (filter_var($dayNumber, FILTER_VALIDATE_INT)) {
+            $configuration->dayNumber = $dayNumber;
+        } else {
+            log::add(__CLASS__, 'error', ' Mauvaise valeur de dayNumber : ' . $dayNumber, __FILE__);
+            throw new Exception('Mauvaise valeur de dayNumber : ' . $dayNumber);
+        }
+    } else {
+        log::add(__CLASS__, 'debug', ' > Pas de dayNumber. Valeur par défaut = 7', __FILE__);
+        $configuration->dayNumber = 7;
+    }
+    unset($dayNumber);
+
+    return $configuration;
+  }
+
+  private static function cleanMessage($limitDateU) {
+    log::add(__CLASS__, 'debug', 'fonction: ' . __FUNCTION__);
+
+    // Récupere les textes présent dans le centre de messages
+    $msg = "";
+    $listMessage = message::all();
+    foreach ($listMessage as $message){
+      // Calcul de la date du message
+      $date = $message->getDate();
+      $dateDT = date_create_from_format('Y-m-d H:i:s', $date);
+      $dateU = $dateDT->format('U');
+
+      if ($limitDateU >= $dateU) {
+        //log::add(__CLASS__, 'debug', ' date à supprimer : '.$date .', message:'.$message->getAction(), __FILE__);
+        $message->remove();
+      }
+      //  else {
+      //   log::add(__CLASS__, 'debug', ' date à garder : '.$date .', message:'.$message->getAction(), __FILE__);
+      // }
+    }
+  }
+
+  private static function cleanLog($limitDateU) {
+    log::add(__CLASS__, 'debug', 'fonction: ' . __FUNCTION__);
+
+    if (log::getConfig('log::engine') != 'StreamHandler') {
+      log::add(__CLASS__, 'info', " SyslogHandler ou SyslogUdp", __FILE__);
+      return;
+    }
+
+    // Récupere les textes présent dans le centre de messages
+    $listLog = log::liste();
+    $skipLog = ['cron_execution', 'http.error', 'update', 'logcleaner'];
+    foreach ($listLog as $log) {
+      if (in_array($log, $skipLog)) {
+        log::add(__CLASS__, 'info', ' skip ' . $log, __FILE__);
+        continue;
+      }
+      log::add(__CLASS__, 'info', ' traitement : '.$log, __FILE__);
+
+      $keepedLine = [];
+      $removedLine = [];
+      $logs = log::get($log, 0, 99999);
+      foreach ($logs as $line) {
+
+        // Extract date from string
+        $extract_date_pattern = '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/';
+        preg_match($extract_date_pattern, $line, $matches);
+        // Calcul de la date du message
+        $date = $matches[0];
+        if ($date != '') {
+          $dateDT = date_create_from_format('Y-m-d H:i:s', $date);
+          $dateU = $dateDT->format('U');
+        }
+
+        if ($date != '' && $dateU != '' && $limitDateU >= $dateU) {
+          array_push($removedLine, $line);
+        } else {
+          array_push($keepedLine, $line);
+        }
+      }
+
+      // Ecriture du fichier
+      log::add(__CLASS__, 'info', ' save : '.$log, __FILE__);
+
+      $keepedLine = array_reverse($keepedLine);
+      $content = implode(PHP_EOL, $keepedLine);
+      log::clear($log);
+      file_put_contents($log, $content);
+
+      // KeepedLine
+      // $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log . '_keeped.txt';
+      // $keepedLine = array_reverse($keepedLine);
+      // $content = implode(PHP_EOL, $keepedLine);
+      // file_put_contents($filename, $content);
+      
+      // // removedLine
+      // $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log . '_removed.txt';
+      // $removedLine = array_reverse($removedLine);
+      // $content = implode(PHP_EOL, $removedLine);
+      // file_put_contents($filename, $content);
+    }
+  }
+
+  // Exécution d'une commande
+  public static function execute($_options = array()) {
+    log::add(__CLASS__, 'info', " **** execute ****", __FILE__);
+
+    $configuration = logcleaner::getMyConfiguration();
+
+    // calcul de la date limite
+    $limitDate = new DateTime('today midnight');
+    $limitDate->modify("-$configuration->dayNumber day");
+    log::add(__CLASS__, 'info', 'Date calculée : ' . $limitDate->format("Y-m-d H:i:s"));
+    $limitDateU= $limitDate->format('U');
+
+    logcleaner::cleanMessage($limitDateU);
+
+    logcleaner::cleanLog($limitDateU);
+  }
 }
 
 class logcleanerCmd extends cmd {
@@ -162,6 +301,7 @@ class logcleanerCmd extends cmd {
 
   // Exécution d'une commande
   public function execute($_options = array()) {
+    
   }
 
   /*     * **********************Getteur Setteur*************************** */
