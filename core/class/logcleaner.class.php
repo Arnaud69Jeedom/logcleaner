@@ -19,6 +19,8 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class logcleaner extends eqLogic {
+  const ROOT_FILENAME = 'zLogCleaner_';
+
   /*     * *************************Attributs****************************** */
 
   /*
@@ -217,6 +219,12 @@ class logcleaner extends eqLogic {
         log::add(__CLASS__, 'info', ' skip ' . $log, __FILE__);
         continue;
       }
+
+      if (substr( $log, 0, strlen(self::ROOT_FILENAME)) === self::ROOT_FILENAME) {
+        log::add(__CLASS__, 'info', ' skip ' . $log, __FILE__);
+        continue;
+      }
+
       log::add(__CLASS__, 'info', ' traitement : '.$log, __FILE__);
 
       $keepedLine = [];
@@ -240,14 +248,39 @@ class logcleaner extends eqLogic {
           array_push($keepedLine, $line);
         }
       }
-
+      
       // Ecriture du fichier
       log::add(__CLASS__, 'info', ' save : '.$log, __FILE__);
+            
+      if (count($keepedLine) > 0) {
+        // Log non vide
+        $keepedLine = array_reverse($keepedLine);
+        $content = implode(PHP_EOL, $keepedLine);
+        log::clear($log);
+        file_put_contents($log, $content);
+      } else {
+        // Log vide
+        $deleteEmpty = config::byKey('deleteEmpty', __CLASS__, '');
+        log::add(__CLASS__, 'debug', ' > deleteEmpty : ' . $deleteEmpty, __FILE__);
+        if ($deleteEmpty == '1') {
+          log::add(__CLASS__, 'info', ' delete empty : '.$log, __FILE__);
 
-      $keepedLine = array_reverse($keepedLine);
-      $content = implode(PHP_EOL, $keepedLine);
-      log::clear($log);
-      file_put_contents($log, $content);
+          $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log;
+          unlink($filename);
+        }
+      }
+
+      // Full backup
+      $fullBackup = config::byKey('fullBackup', __CLASS__, '');
+      log::add(__CLASS__, 'debug', ' > fullBackup : ' . $fullBackup, __FILE__);
+      if ($fullBackup == '1') {
+        log::add(__CLASS__, 'info', ' full backup : '.$log, __FILE__);
+
+        $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_full.bak';
+        $lines = array_reverse($logs);
+        $content = implode(PHP_EOL, $lines);
+        file_put_contents($filename, $content);
+      }
 
       // KeepedLine
       // $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log . '_keeped.txt';
@@ -255,11 +288,16 @@ class logcleaner extends eqLogic {
       // $content = implode(PHP_EOL, $keepedLine);
       // file_put_contents($filename, $content);
       
-      // // removedLine
-      // $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log . '_removed.txt';
-      // $removedLine = array_reverse($removedLine);
-      // $content = implode(PHP_EOL, $removedLine);
-      // file_put_contents($filename, $content);
+      // Full backup
+      $differentialBackup = config::byKey('differentialBackup', __CLASS__, '');
+      log::add(__CLASS__, 'debug', ' > differentialBackup : ' . $differentialBackup, __FILE__);
+      if ($differentialBackup == '1' &&  count($removedLine) > 0) {
+        // removedLine
+        $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_removed.bak';
+        $removedLine = array_reverse($removedLine);
+        $content = implode(PHP_EOL, $removedLine);
+        file_put_contents($filename, $content);
+      }
     }
   }
 
