@@ -41,7 +41,8 @@ class logcleaner extends eqLogic {
   * Fonction exécutée automatiquement toutes les minutes par Jeedom
   */
   // public static function cron() {
-  //   log::add(__CLASS__, 'debug', " **** cron ****", __FILE__);
+  //   log::add(__CLASS__, 'debug', " **** cron ****");
+
   //   logcleaner::execute();
   // }
 
@@ -74,7 +75,7 @@ class logcleaner extends eqLogic {
   * Fonction exécutée automatiquement tous les jours par Jeedom
   */
   public static function cronDaily() {
-    log::add(__CLASS__, 'debug', " **** cronDaily ****", __FILE__);
+    log::add(__CLASS__, 'debug', " **** cronDaily ****");
     logcleaner::execute();
   }
 
@@ -160,19 +161,19 @@ class logcleaner extends eqLogic {
     // Lecture et Analyse de la configuration
 
     // Nombre de jours
-    log::add(__CLASS__, 'debug', ' Récupération nb jours', __FILE__);
+    log::add(__CLASS__, 'debug', ' Récupération nb jours');
     $dayNumber = config::byKey('dayNumber', __CLASS__);
-    log::add(__CLASS__, 'debug', ' > Nb jours : ' . $dayNumber, __FILE__);
+    log::add(__CLASS__, 'debug', ' > Nb jours : ' . $dayNumber);
 
     if ($dayNumber != '') {
         if (filter_var($dayNumber, FILTER_VALIDATE_INT)) {
             $configuration->dayNumber = $dayNumber;
         } else {
-            log::add(__CLASS__, 'error', ' Mauvaise valeur de dayNumber : ' . $dayNumber, __FILE__);
+            log::add(__CLASS__, 'error', ' Mauvaise valeur de dayNumber : ' . $dayNumber);
             throw new Exception('Mauvaise valeur de dayNumber : ' . $dayNumber);
         }
     } else {
-        log::add(__CLASS__, 'debug', ' > Pas de dayNumber. Valeur par défaut = 7', __FILE__);
+        log::add(__CLASS__, 'debug', ' > Pas de dayNumber. Valeur par défaut = 7');
         $configuration->dayNumber = 7;
     }
     unset($dayNumber);
@@ -193,11 +194,11 @@ class logcleaner extends eqLogic {
       $dateU = $dateDT->format('U');
 
       if ($limitDateU >= $dateU) {
-        //log::add(__CLASS__, 'debug', ' date à supprimer : '.$date .', message:'.$message->getAction(), __FILE__);
+        // log::add(__CLASS__, 'debug', ' date à supprimer : '.$date .', message:'.$message->getAction());
         $message->remove();
       }
       //  else {
-      //   log::add(__CLASS__, 'debug', ' date à garder : '.$date .', message:'.$message->getAction(), __FILE__);
+      //   log::add(__CLASS__, 'debug', ' date à garder : '.$date .', message:'.$message->getAction());
       // }
     }
   }
@@ -206,7 +207,7 @@ class logcleaner extends eqLogic {
     log::add(__CLASS__, 'debug', 'fonction: ' . __FUNCTION__);
 
     if (log::getConfig('log::engine') != 'StreamHandler') {
-      log::add(__CLASS__, 'info', " SyslogHandler ou SyslogUdp", __FILE__);
+      log::add(__CLASS__, 'info', " SyslogHandler ou SyslogUdp");
       return;
     }
 
@@ -216,16 +217,16 @@ class logcleaner extends eqLogic {
      'logcleaner'];
     foreach ($listLog as $log) {
       if (in_array($log, $skipLog)) {
-        log::add(__CLASS__, 'info', ' skip ' . $log, __FILE__);
+        log::add(__CLASS__, 'info', ' skip ' . $log);
         continue;
       }
 
       if (substr( $log, 0, strlen(self::ROOT_FILENAME)) === self::ROOT_FILENAME) {
-        log::add(__CLASS__, 'info', ' skip ' . $log, __FILE__);
+        log::add(__CLASS__, 'info', ' skip ' . $log);
         continue;
       }
 
-      log::add(__CLASS__, 'info', ' traitement : '.$log, __FILE__);
+      log::add(__CLASS__, 'info', ' traitement : '.$log);
 
       $keepedLine = [];
       $removedLine = [];
@@ -250,7 +251,7 @@ class logcleaner extends eqLogic {
       }
       
       // Ecriture du fichier
-      log::add(__CLASS__, 'info', ' save : '.$log, __FILE__);
+      log::add(__CLASS__, 'info', ' save : '.$log);
             
       if (count($keepedLine) > 0) {
         // Log non vide
@@ -261,9 +262,9 @@ class logcleaner extends eqLogic {
       } else {
         // Log vide
         $deleteEmpty = config::byKey('deleteEmpty', __CLASS__, '');
-        log::add(__CLASS__, 'debug', ' > deleteEmpty : ' . $deleteEmpty, __FILE__);
+        log::add(__CLASS__, 'debug', ' > deleteEmpty : ' . $deleteEmpty);
         if ($deleteEmpty == '1') {
-          log::add(__CLASS__, 'info', ' delete empty : '.$log, __FILE__);
+          log::add(__CLASS__, 'info', ' delete empty : '.$log);
 
           $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log;
           unlink($filename);
@@ -272,9 +273,9 @@ class logcleaner extends eqLogic {
 
       // Full backup
       $fullBackup = config::byKey('fullBackup', __CLASS__, '');
-      log::add(__CLASS__, 'debug', ' > fullBackup : ' . $fullBackup, __FILE__);
+      log::add(__CLASS__, 'debug', ' > fullBackup : ' . $fullBackup);
       if ($fullBackup == '1') {
-        log::add(__CLASS__, 'info', ' full backup : '.$log, __FILE__);
+        log::add(__CLASS__, 'info', ' full backup : '.$log);
 
         $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_full.bak';
         $lines = array_reverse($logs);
@@ -290,7 +291,7 @@ class logcleaner extends eqLogic {
       
       // Full backup
       $differentialBackup = config::byKey('differentialBackup', __CLASS__, '');
-      log::add(__CLASS__, 'debug', ' > differentialBackup : ' . $differentialBackup, __FILE__);
+      log::add(__CLASS__, 'debug', ' > differentialBackup : ' . $differentialBackup);
       if ($differentialBackup == '1' &&  count($removedLine) > 0) {
         // removedLine
         $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_removed.bak';
@@ -303,7 +304,7 @@ class logcleaner extends eqLogic {
 
   // Exécution d'une commande
   public static function execute($_options = array()) {
-    log::add(__CLASS__, 'info', " **** execute ****", __FILE__);
+    log::add(__CLASS__, 'info', " **** execute ****");
 
     $configuration = logcleaner::getMyConfiguration();
 
