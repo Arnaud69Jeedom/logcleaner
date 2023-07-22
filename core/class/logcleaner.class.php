@@ -216,26 +216,24 @@ class logcleaner extends eqLogic {
     $skipLog = ['cron_execution', 'http.error', 'update', ' listener_execution', 'scenario_execution',
      'logcleaner'];
     foreach ($listLog as $log) {
+      log::add(__CLASS__, 'info', ' traitement : '.$log);
+
       if (in_array($log, $skipLog)) {
-        log::add(__CLASS__, 'info', ' skip ' . $log);
+        log::add(__CLASS__, 'info', ' > skip ');
         continue;
       }
 
       if (substr( $log, 0, strlen(self::ROOT_FILENAME)) === self::ROOT_FILENAME) {
-        log::add(__CLASS__, 'info', ' skip ' . $log);
+        log::add(__CLASS__, 'info', ' > skip ');
         continue;
       }
 
-      log::add(__CLASS__, 'info', ' traitement : '.$log);
-
+      // Ecriture du fichier
+      log::add(__CLASS__, 'info', ' > nettoyage');
       $keepedLine = [];
       $removedLine = [];
       $lines = log::get($log, 0, 99999);
       foreach ($lines as $line) {
-
-        // Ecriture du fichier
-        log::add(__CLASS__, 'info', ' > nettoyage');
-
         // Extract date from string
         $extract_date_pattern = '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/';
         preg_match($extract_date_pattern, $line, $matches);
