@@ -230,8 +230,11 @@ class logcleaner extends eqLogic {
 
       $keepedLine = [];
       $removedLine = [];
-      $logs = log::get($log, 0, 99999);
-      foreach ($logs as $line) {
+      $lines = log::get($log, 0, 99999);
+      foreach ($lines as $line) {
+
+        // Ecriture du fichier
+        log::add(__CLASS__, 'info', ' > nettoyage');
 
         // Extract date from string
         $extract_date_pattern = '/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/';
@@ -250,10 +253,10 @@ class logcleaner extends eqLogic {
         }
       }
       
-      // Ecriture du fichier
-      log::add(__CLASS__, 'info', ' save : '.$log);
-            
       if (count($keepedLine) > 0) {
+        // Ecriture du fichier
+        log::add(__CLASS__, 'info', ' > save');
+
         // Log non vide
         $keepedLine = array_reverse($keepedLine);
         $content = implode(PHP_EOL, $keepedLine);
@@ -264,7 +267,7 @@ class logcleaner extends eqLogic {
         $deleteEmpty = config::byKey('deleteEmpty', __CLASS__, '');
         log::add(__CLASS__, 'debug', ' > deleteEmpty : ' . $deleteEmpty);
         if ($deleteEmpty == '1') {
-          log::add(__CLASS__, 'info', ' delete empty : '.$log);
+          log::add(__CLASS__, 'info', ' > delete empty');
 
           $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log;
           unlink($filename);
@@ -275,10 +278,10 @@ class logcleaner extends eqLogic {
       $fullBackup = config::byKey('fullBackup', __CLASS__, '');
       log::add(__CLASS__, 'debug', ' > fullBackup : ' . $fullBackup);
       if ($fullBackup == '1') {
-        log::add(__CLASS__, 'info', ' full backup : '.$log);
+        log::add(__CLASS__, 'info', ' > full backup');
 
         $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_full.bak';
-        $lines = array_reverse($logs);
+        $lines = array_reverse($lines);
         $content = implode(PHP_EOL, $lines);
         file_put_contents($filename, $content);
       }
@@ -293,6 +296,8 @@ class logcleaner extends eqLogic {
       $differentialBackup = config::byKey('differentialBackup', __CLASS__, '');
       log::add(__CLASS__, 'debug', ' > differentialBackup : ' . $differentialBackup);
       if ($differentialBackup == '1' &&  count($removedLine) > 0) {
+        log::add(__CLASS__, 'info', ' > differential backup');
+
         // removedLine
         $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . self::ROOT_FILENAME . $log . '_removed.bak';
         $removedLine = array_reverse($removedLine);

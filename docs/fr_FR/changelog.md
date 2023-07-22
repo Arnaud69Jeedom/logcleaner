@@ -4,6 +4,10 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+# 22/07/2023 - BETA
+
+- DEBUG : Amélioration des logs
+
 # 14/07/2023 - BETA
 
 - DEBUG : Correction sur gestion des logs
