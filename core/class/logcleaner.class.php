@@ -213,7 +213,7 @@ class logcleaner extends eqLogic {
 
     // Récupere les textes présent dans le centre de messages
     $listLog = log::liste();
-    $skipLog = ['cron_execution', 'http.error', 'update', ' listener_execution', 'scenario_execution',
+    $skipLog = ['cron_execution', 'http.error', 'update', 'listener_execution', 'scenario_execution',
      'logcleaner'];
     foreach ($listLog as $log) {
       log::add(__CLASS__, 'info', ' traitement : '.$log);
