@@ -15,7 +15,7 @@ Le plus permet de nettoyer automatiquement les logs et les messages trop anciens
 La configuration est plutôt simple.
 Elle se fait exclusivement dans la partie Générale du plugin, et il n'y a pas d'équipement à créer.
 
-(../images/Param_General.png)
+![Configuration Plugin](../images/Param_General.png)
 
 * Nombre de jours : Nombre de jours à garder.
 * Supprimer log vide : Permet de supprimer les logs qui sont vides
