@@ -15,6 +15,7 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 include_file('core', 'authentification', 'php');
 if (!isConnect()) {
@@ -22,3 +23,31 @@ if (!isConnect()) {
   die();
 }
 ?>
+<form class="form-horizontal">
+  <fieldset>
+    <div class="form-group">
+      <label class="col-md-4 control-label">{{Nombre de jours}}</label>
+      <div class="col-md-4">
+        <input class="configKey form-control" placeholder="7" data-l1key="dayNumber"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-4 control-label">{{Supprimer log vide}}</label>
+      <div class="col-xs-4">
+        <input type="checkbox" class="configKey form-control" data-l1key="deleteEmpty" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-4 control-label">{{Backup complet}}</label>
+      <div class="col-xs-4">
+        <input type="checkbox" class="configKey form-control" data-l1key="fullBackup" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-xs-4 control-label">{{Backup différentiel}}</label>
+      <div class="col-xs-4">
+        <input type="checkbox" class="configKey form-control" data-l1key="differentialBackup" />
+      </div>
+    </div>
+  </fieldset>
+</form>
