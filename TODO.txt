@@ -1,1 +1,10 @@
 Liste des choses à faire :
+- Paramétrer plugin à ignorer
+- Gestion des erreurs sur accès log 
+    log::clear($log);
+    file_put_contents($log, $content);
+
+    $filename = log::getPathToLog('') . DIRECTORY_SEPARATOR . $log;
+    unlink($filename);
+- Utiliser  log::remove(  $_log) pour le nettoyage
+(https://doc.jeedom.com/dev/phpdoc/4.3/classes/log.html)
